@@ -80,5 +80,8 @@ export class AppController {
       
     })
  }
- 
+ @Delete('user/:id')
+ async DeleteUser(@Param ('id') id: String): Promise<UserModel>{
+  return this.prismaService.user.delete({where: {id: Number(id)}})
+ }
 }

@@ -1,0 +1,107 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  first_name String  @db.VarChar(255)
+  last_name String   @db.VarChar(255)
+  email     String   @db.VarChar(255)
+  password  String   @db.VarChar(255)
+  image     String?  @db.Text
+  about     String?  @db.VarChar(255)
+  user_name String   @db.VarChar(255)
+  wishlist  Wishlist[]
+  own       Own[]
+  project   Project[]
+  saved     Saved[]
+}
+
+
+model Product {
+  id          Int     @id @default(autoincrement())
+	categorie   String  @db.VarChar(255)
+	brand       String  @db.VarChar(255)
+	name        String  @db.VarChar(255)
+	color       String  @db.VarChar(255)
+	description String  @db.VarChar(255)
+	link        String  @db.Text
+  wishlist_product  Wishlist_Product[] 
+  own_product   Own_Product[]
+  project_product Project_Product[]
+}
+
+model Wishlist {
+  id          Int     @id @default(autoincrement())
+	name        String  @db.VarChar(255)
+  user        User    @relation(fields: [user_id], references: [id])     
+	user_id     Int
+  wishlist_product  Wishlist_Product[] 
+}
+model Wishlist_Product {
+  id            Int     @id @default(autoincrement())   
+  wishlist      Wishlist    @relation(fields: [wishlist_id], references: [id])     
+	wishlist_id   Int
+  product       Product    @relation(fields: [product_id], references: [id])     
+	product_id    Int
+  }
+
+model Own {
+  id          Int     @id @default(autoincrement())
+  user        User    @relation(fields: [user_id], references: [id])     
+	user_id     Int
+  own_product   Own_Product[]
+}
+
+model Own_Product {
+  id          Int     @id @default(autoincrement())
+	product     Product    @relation(fields: [product_id], references: [id])     
+	product_id  Int
+	own         Own    @relation(fields: [own_id], references: [id])     
+	own_id      Int
+
+}
+
+model Project {
+  id          Int     @id @default(autoincrement())
+	name        String  @db.VarChar(255)
+	image       String? @db.Text
+	description String? @db.VarChar(255)
+  public      Boolean @db.Boolean
+	user        User    @relation(fields: [user_id], references: [id])     
+	user_id     Int
+  project_product Project_Product[]
+  saved_project Saved_Project[]
+  }
+
+model Project_Product {
+
+  id          Int        @id @default(autoincrement())
+	product     Product    @relation(fields: [product_id], references: [id])     
+	product_id  Int
+	project     Project    @relation(fields: [project_id], references: [id])     
+	project_id  Int
+  }
+
+model Saved {
+  id          Int     @id @default(autoincrement())
+  user        User    @relation(fields: [user_id], references: [id])     
+	user_id     Int
+  saved_project Saved_Project[]
+}
+
+model Saved_Project {
+  id          Int     @id @default(autoincrement())
+	project     Project    @relation(fields: [project_id], references: [id])     
+	project_id  Int
+	saved     Saved    @relation(fields: [saved_id], references: [id])     
+	saved_id  Int
+}

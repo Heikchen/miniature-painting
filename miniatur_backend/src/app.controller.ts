@@ -1,12 +1,73 @@
-import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
+import {
+  Controller,
+  Get,
+  Param,
+  Post,
+  Body,
+  Put,
+  Delete,
+  Query,
+} from '@nestjs/common'
+import { PrismaService } from './prisma/prisma.service'
+import { User as UserModel, Prisma } from '@prisma/client'
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(private readonly prismaService: PrismaService) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  @Get('users')
+  async getAllUsers(): Promise<UserModel[]> {
+    return this.prismaService.user.findMany()
   }
+
+  @Post('signup')
+  async signupUser(
+    @Body()
+    userData: {
+      first_name: string
+      last_name: string
+      email: string
+      password: string
+      user_name: string
+      
+    },
+  ): Promise<UserModel> {
+    
+    return this.prismaService.user.create({
+      data: {
+        first_name: userData.first_name,
+        last_name: userData.last_name,
+        email: userData.email,
+        password: userData.password,
+        user_name: userData.user_name
+      },
+    })
+  }
+  @Put('user/:id')
+ async UpdateUser(@Param('id') id: string ,@Body()userData: {
+      first_name: string
+      last_name: string
+      email: string
+      password: string
+      user_name: string
+      image:string
+      about:string
+      
+    },): Promise<UserModel>{
+    return this.prismaService.user.update({
+      where: { id: Number(id) },
+      data: {
+        first_name: userData.first_name,
+        last_name: userData.last_name,
+        email: userData.email,
+        password: userData.password,
+        user_name: userData.user_name,
+        image: userData.image,
+        about: userData.about
+
+        }
+      
+    })
+ }
+ 
 }

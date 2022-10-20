@@ -16,8 +16,19 @@ export class AppController {
   constructor(private readonly prismaService: PrismaService) {}
 
   @Get('users')
-  async getAllUsers(): Promise<UserModel[]> {
-    return this.prismaService.user.findMany()
+  async getAllUsers(
+    @Query('take') take?: number,
+    @Query('skip') skip?: number): Promise<UserModel[]> {
+    return this.prismaService.user.findMany({
+      take: Number(take) || undefined,
+      skip: Number(skip) || undefined
+    })
+  }
+    @Get('user/:id')
+  async getUser(@Param('id') id: String): Promise<UserModel> {
+    return this.prismaService.user.findUnique({
+      where: { id: Number(id) }
+    })
   }
 
   @Post('signup')

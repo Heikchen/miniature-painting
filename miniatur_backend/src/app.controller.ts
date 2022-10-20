@@ -130,4 +130,37 @@ async CreateProduct(@Body() productData:{
       }
     })
 }
+@Get('product/:id')
+  async GetProduct(@Param('id') id: String): Promise<ProductModel> {
+    return this.prismaService.product.findUnique({
+      where: { id: Number(id) }
+    })
+  }
+
+@Put('product/:id')
+ async UpdateProduct(@Param('id') id: string ,@Body()productData: {
+    categorie: string  
+	  brand:string       
+	  name:string       
+	  color:string       
+	  description: string
+	  link: string  
+      
+    },): Promise<ProductModel>{
+    return this.prismaService.product.update({
+      where: { id: Number(id) },
+        data: {
+          categorie: productData.categorie,
+          brand: productData.brand,
+          name: productData.name,
+          color: productData.color,
+          description: productData.description,
+          link: productData.link
+        } 
+    })
+ }
+ @Delete('product/:id')
+ async DeleteProduct(@Param ('id') id: String): Promise<ProductModel>{
+  return this.prismaService.product.delete({where: {id: Number(id)}})
+ }
 }

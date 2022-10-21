@@ -9,7 +9,9 @@ import {
   Query,
 } from '@nestjs/common'
 import { PrismaService } from './prisma/prisma.service'
-import { User as UserModel, Product as ProductModel, Prisma } from '@prisma/client'
+import { User as UserModel, Product as ProductModel, Wishlist as WishlistModel } from '@prisma/client'
+import { userInfo } from 'os'
+
 
 @Controller()
 export class AppController {
@@ -131,7 +133,7 @@ async CreateProduct(@Body() productData:{
     })
 }
 @Get('product/:id')
-  async GetProduct(@Param('id') id: String): Promise<ProductModel> {
+  async GetProduct(@Param('id') id: string): Promise<ProductModel> {
     return this.prismaService.product.findUnique({
       where: { id: Number(id) }
     })
@@ -163,4 +165,56 @@ async CreateProduct(@Body() productData:{
  async DeleteProduct(@Param ('id') id: String): Promise<ProductModel>{
   return this.prismaService.product.delete({where: {id: Number(id)}})
  }
+
+@Post(':user_id/wishlist')
+async CreateWishlist(@Param('user_id')user_id:String, @Body() wishlistData:{
+  name: string
+}):Promise<WishlistModel>{
+  const { name} = wishlistData
+return this.prismaService.wishlist.create({
+      data: {
+        name, 
+        user:{
+          connect:{
+            id:Number(user_id)
+          }
+        }
+        }
+      })
+    } 
+
+@Get(':user_id/wishlist')
+async GetAllWishlists(@Param('user_id') user_id: String):Promise<WishlistModel[]>{
+  return this.prismaService.wishlist.findMany({
+    where: {user_id: Number(user_id)}
+  })
+}
+@Get(':user_id/wishlist/:id')
+async GetWishlist(@Param('user_id')user_id: String,@Param('id') id: String):Promise<WishlistModel>{
+return this.prismaService.wishlist.findFirst({
+  where: {AND:[
+ { id: Number(id)}, 
+ {user_id: Number(user_id)}
+  ]}
+})
+}
+
+
+@Delete('wishlist/:id')
+async DeleteWishlist(@Param('id') id: String):Promise<WishlistModel>{
+  return this.prismaService.wishlist.delete({
+  where: { id: Number(id)}
+  })
+}
+@Put('wishlist/:id')
+async UpdateWishlist(@Param('id') id: String, @Body() updateData:{
+  name: string
+}): Promise<WishlistModel>{
+  return this.prismaService.wishlist.update({
+    where:{id: Number(id)},
+    data:{
+      name: updateData.name
+    }
+  })
+}
 }
